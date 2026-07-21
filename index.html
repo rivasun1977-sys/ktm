@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>筋トレマスター</title>
+<style>
+body{font-family:Arial;background:#111;color:#fff;max-width:900px;margin:auto;padding:20px}
+h1{text-align:center;color:#ff5252}.card{background:#222;padding:15px;border-radius:10px;margin:15px 0}
+.row{display:flex;gap:12px;flex-wrap:wrap}.group{flex:1;min-width:180px}
+label{display:block;margin-bottom:5px}input,select{width:100%;padding:8px;box-sizing:border-box}
+.time{display:flex;align-items:center;gap:6px}.time input{width:70px}
+button{background:#e53935;color:#fff;border:none;padding:12px 24px;border-radius:8px}
+table{width:100%;border-collapse:collapse}th,td{border:1px solid #555;padding:8px;text-align:center}th{background:#e53935}
+</style></head><body>
+<h1>💪筋トレマスター</h1>
+<div class="card">
+<div class="row">
+<div class="group"><label>回数</label><input id="length" type="number"></div>
+<div class="group"><label>1分あたりの回数</label><input id="speed" type="number"></div>
+</div>
+<div class="row">
+<div class="group"><label>1セットの時間</label>
+<div class="time"><input id="hour" readonly><span>時間</span><input id="minute" readonly><span>分</span></div></div>
+<div class="group"><label>インターバル(分)</label><input id="loss" type="number" value="0"></div>
+</div>
+<div class="row">
+<div class="group"><label>開始日</label><input id="startDate" type="date"></div>
+<div class="group"><label>開始時刻</label><div class="time"><select id="startHour"></select><span>:</span><select id="startMinute"></select></div></div>
+<div class="group"><label>セット数</label><input id="count" type="number" value="1"></div>
+</div>
+<p><button id="calcButton">計算する</button></p></div>
+<div class="card"><table id="resultTable"><thead><tr><th>セット</th><th>日付</th><th>開始時刻</th></tr></thead><tbody></tbody></table></div>
+<script>
+const length=document.getElementById('length'),speed=document.getElementById('speed'),hour=document.getElementById('hour'),minute=document.getElementById('minute');
+const loss=document.getElementById('loss'),count=document.getElementById('count'),startDate=document.getElementById('startDate'),startHour=document.getElementById('startHour'),startMinute=document.getElementById('startMinute'),calcButton=document.getElementById('calcButton'),resultTable=document.getElementById('resultTable');
+const now=new Date();startDate.value=now.toISOString().split('T')[0];
+for(let i=0;i<24;i++)startHour.add(new Option(String(i).padStart(2,'0'),i));
+for(let i=0;i<60;i++)startMinute.add(new Option(String(i).padStart(2,'0'),i));
+startHour.value=now.getHours();startMinute.value=now.getMinutes();
+function calcTime(){const l=Number(length.value),s=Number(speed.value);if(!s)return;const tm=Math.round(l/s);hour.value=Math.floor(tm/60);minute.value=tm%60;}
+length.addEventListener('input',calcTime);speed.addEventListener('input',calcTime);
+calcButton.onclick=()=>{const tb=resultTable.tBodies[0];tb.innerHTML='';let dt=new Date(startDate.value+'T'+String(startHour.value).padStart(2,'0')+':'+String(startMinute.value).padStart(2,'0'));let last='';
+for(let i=1;i<=Number(count.value);i++){dt.setHours(dt.getHours()+Number(hour.value));dt.setMinutes(dt.getMinutes()+Number(minute.value));const d=`${dt.getFullYear()}/${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')}`;const tr=tb.insertRow();tr.insertCell().textContent=i;tr.insertCell().textContent=(d===last)?'':d;last=d;tr.insertCell().textContent=`${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;dt.setMinutes(dt.getMinutes()+Number(loss.value));}}
+</script></body></html>
