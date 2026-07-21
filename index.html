@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>筋トレマスター</title>
+<style>
+body{font-family:Arial,sans-serif;background:#111;color:#fff;max-width:900px;margin:auto;padding:20px}
+h1{text-align:center;color:#ff5252}
+.card{background:#222;padding:15px;border-radius:10px;margin-bottom:15px}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.group{flex:1;min-width:180px}
+label{display:block;margin-bottom:5px}
+input,select{width:100%;padding:8px;box-sizing:border-box}
+button{background:#e53935;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:16px;cursor:pointer}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #555;padding:8px;text-align:center}
+th{background:#e53935}
+</style>
+</head>
+<body>
+<h1>💪 筋トレマスター</h1>
+<div class="card">
+<div class="row">
+<div class="group"><label>回数</label><input id="length" type="number"></div>
+<div class="group"><label>1分あたりの回数</label><input id="speed" type="number"></div>
+</div>
+<div class="row">
+<div class="group"><label>1セットの時間</label><div class="row"><input id="hour" type="number"><input id="minute" type="number"></div></div>
+<div class="group"><label>インターバル(分)</label><input id="loss" type="number" value="0"></div>
+</div>
+<div class="row">
+<div class="group"><label>開始日</label><input id="startDate" type="date"></div>
+<div class="group"><label>開始時刻</label><div class="row"><select id="startHour"></select><select id="startMinute"></select></div></div>
+</div>
+<div class="row">
+<div class="group"><label>セット数</label><input id="count" type="number" value="1"></div>
+</div>
+<p><button id="calcButton">計算する</button></p>
+</div>
+<div class="card">
+<table id="resultTable"><thead><tr><th>セット</th><th>日付</th><th>開始時刻</th></tr></thead><tbody></tbody></table>
+</div>
+<script>
+const t=new Date();
+startDate.value=t.toISOString().split('T')[0];
+for(let i=0;i<24;i++)startHour.add(new Option(String(i).padStart(2,'0'),i));
+for(let i=0;i<60;i++)startMinute.add(new Option(String(i).padStart(2,'0'),i));
+startHour.value=t.getHours();startMinute.value=t.getMinutes();
+function calc(){let l=+length.value,s=+speed.value;if(s>0){let m=Math.round(l/s);hour.value=Math.floor(m/60);minute.value=m%60;}}
+length.oninput=calc;speed.oninput=calc;
+calcButton.onclick=()=>{
+let tb=resultTable.tBodies[0];tb.innerHTML='';
+let dt=new Date(startDate.value+'T'+String(startHour.value).padStart(2,'0')+':'+String(startMinute.value).padStart(2,'0'));
+let last='';
+for(let i=1;i<=+count.value;i++){
+dt.setHours(dt.getHours()+(+hour.value));dt.setMinutes(dt.getMinutes()+(+minute.value));
+let d=dt.getFullYear()+'/'+String(dt.getMonth()+1).padStart(2,'0')+'/'+String(dt.getDate()).padStart(2,'0');
+let tr=tb.insertRow();
+tr.insertCell().textContent=i;
+tr.insertCell().textContent=(d===last)?'':d;
+last=d;
+tr.insertCell().textContent=String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
+dt.setMinutes(dt.getMinutes()+(+loss.value));
+}
+}
+</script>
+</body></html>
